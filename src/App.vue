@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <!-- 头部 -->
+    
     <div class="header">
         <!-- 1.0 导航栏头部 -->
         <div class="head-top">
@@ -11,23 +12,27 @@
                     <a target="_blank" href="#"></a>
                 </div>
                 <div id="menu" class="right-box">
-                    <span style="display: none;">
-                        <a href="" class="">登录</a>
+                    <!-- 未登录 -->
+                    <span v-show="$store.state.checkLoginState==false">
+                  <router-link to="/login">登录</router-link>
                         <strong>|</strong>
                         <a href="" class="">注册</a>
                         <strong>|</strong>
                     </span>
-                    <span>
+                    <!-- 登录后显示 -->
+                    <span v-show="$store.state.checkLoginState==true">
                         <a href="" class="">会员中心</a>
                         <strong>|</strong>
-                        <a>退出</a>
+                        <a @click="logout">退出</a>
                         <strong>|</strong>
                     </span>
-                    <a href="" class="">
-                        <i class="iconfont icon-cart"></i>购物车(
+                        <router-link to="/shopcar">
+                        <i ref="cart" class="iconfont icon-cart"></i>购物车
                         <span id="shoppingCartCount">
-                            <span>4</span>
-                        </span>)</a>
+                            <span>{{$store.getters.carGoodCount}}</span>
+                        </span>
+                        </router-link>
+                       
                 </div>
             </div>
         </div>
@@ -79,6 +84,7 @@
                 </div>
             </div>
         </div>
+         
     </div>
     <router-view></router-view>
     <!-- 尾部 -->
@@ -113,19 +119,100 @@
                     </div>
                 </div>
             </div>
+  
+   <BackTop :bottom="50">
+        <div class="top">🎈</div>
+    </BackTop>
   </div>
+   
 </template>
 <script>
-
+import $ from "jquery";
 export default {
   name: 'app',
   components: {
    
+  },
+  methods:{
+checknum(){
+    console.log(this.$store.state.count);
+    this.$store.commit('increment');
+},
+ logout(){
+      this.$axios.get("site/account/logout").then(response=>{
+          console.log(response);
+               this.$confirm('你确定要离开我吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$message({
+            type: 'success',
+            message: '退出成功,欢迎下次回来'
+          });
+          this.$router.push("/index");
+          this.$store.commit('updateLogin',false)
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });          
+        });
+      })
   }
+  },
+created() {
+    // console.log('顶级Vue示例的生命周期函数');
+  this.$axios.get('site/account/islogin').then(response => {
+      console.log(response);
+      if (response.data.code == 'logined') {
+        // 登录了
+        console.log("我登陆了");
+        
+       this.$store.commit('updateLogin', true);
+      } else {
+        // 没有登录
+    this.$store.commit('updateLogin', false);
+      }
+    })
+  },
+beforeMount() {
+      
+  },
+  mounted(){
+      $("#menu2 li a").wrapInner( '<span class="out"></span>' );
+	$("#menu2 li a").each(function() {
+		$( '<span class="over">' +  $(this).text() + '</span>' ).appendTo( this );
+	});
+
+	$("#menu2 li a").hover(function() {
+		$(".out",	this).stop().animate({'top':	'48px'},	300); // move down - hide
+		$(".over",	this).stop().animate({'top':	'0px'},		300); // move down - show
+
+	}, function() {
+		$(".out",	this).stop().animate({'top':	'0px'},		300); // move up - show
+		$(".over",	this).stop().animate({'top':	'-48px'},	300); // move up - hide
+	});
+
+  },
+ 
+  
 }
 </script>
 
 <style>
 /* 导入样式 */
 @import url("./assets/statics/site/css/style.css");
+.menuhd ul li a span.over{
+    background-color: yellowgreen;
+}
+.top{
+        padding: 10px;
+        /* background: rgba(0, 153, 229, .7); */
+        color: #fff;
+        text-align: center;
+        border: 1px solid blue;
+        border-radius: 50%;
+        font-size: 50px;
+    }
 </style>
