@@ -112,7 +112,7 @@
                           <router-link to="/index" >
                             <button class="button" >继续购物</button>
                           </router-link>
-                            <router-link to="/checkOrder"  >
+                            <router-link  :to="'/checkOrder/'+selectId"  >
                                 <button class="submit" >立即结算</button>
                             </router-link>
                         </div>
@@ -131,12 +131,11 @@ export default {
   name: "shopcar",
   data: function() {
     return {
-      goodList: [],
-     
+      goodList: []
     };
   },
   methods: {
-      //拼接id字符串
+    //拼接id字符串
     getshopcargoods() {
       let ids = "";
       for (let key in this.$store.state.shopCarData) {
@@ -147,73 +146,77 @@ export default {
       ids = ids.slice(0, -1);
       this.$axios.get(`site/comment/getshopcargoods/${ids}`).then(response => {
         // let shopcarlist = response.data.message;
-        this.goodList=response.data.message;
-       //修改商品数量为正确的数值 添加一个选择对象到goodlist里 
-        response.data.message.forEach(element => { 
+        this.goodList = response.data.message;
+        //修改商品数量为正确的数值 添加一个选择对象到goodlist里
+        response.data.message.forEach(element => {
           element.buycount = this.$store.state.shopCarData[element.id];
-        //   element.selected = true;
-          this.$set(element,"selected",true)
-          
+          //   element.selected = true;
+          this.$set(element, "selected", true);
         });
         console.log(this.goodList);
-        
+
         // this.goodList = shopcarlist;
-     
       });
     },
-    //因为数量是vuex里获取的，所以增加数量的时候要设置vuex里的数值 
+    //因为数量是vuex里获取的，所以增加数量的时候要设置vuex里的数值
     upDataBuyNum(id, newcount) {
       this.$store.commit("updateCount", {
         id,
         newcount
       });
     },
-    delOne(delid){
- this.$confirm('确定删除此宝贝吗??', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-             this.goodList.forEach((e,index)=>{
-                if(e.id==delid){
-                    this.goodList.splice(index,1);
-                }
-            })
-            this.$store.commit("delGood",delid);
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          });
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });          
-        });
-
-
-
-         
-    },
-   
-  },
-  computed:{
-      countNum(){
-       let subNum=0;
-       let subPrice=0;
-        this.goodList.forEach(element => {
-            if(element.selected==true){
-                subNum+=element.buycount;
-                subPrice+=element.sell_price*element.buycount
+    delOne(delid) {
+      this.$confirm("确定删除此宝贝吗??", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.goodList.forEach((e, index) => {
+            if (e.id == delid) {
+              this.goodList.splice(index, 1);
             }
-           
+          });
+          this.$store.commit("delGood", delid);
+          this.$message({
+            type: "success",
+            message: "删除成功!"
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
         });
-         return {
-             subNum,
-             subPrice
-             }
-      },
-      
+    }
+  },
+  computed: {
+    countNum() {
+      let subNum = 0;
+      let subPrice = 0;
+      this.goodList.forEach(element => {
+        if (element.selected == true) {
+          subNum += element.buycount;
+          subPrice += element.sell_price * element.buycount;
+        }
+      });
+      return {
+        subNum,
+        subPrice
+      };
+    },
+    selectId() {
+      let ids = "";
+      this.goodList.forEach(element => {
+        if (element.selected == true) {
+          ids += element.id;
+          ids += ",";
+        }
+      });
+      ids = ids.slice(0, -1);
+      return ids;
+    }
   },
   created() {
     this.getshopcargoods();

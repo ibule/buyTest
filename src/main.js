@@ -59,6 +59,7 @@ import detail from "./components/detail.vue"
 import shopcar from "./components/shopcar.vue"
 import checkOrder from "./components/checkOrder.vue"
 import login from "./components/login.vue"
+import payOrder from "./components/payOrder.vue"
 import "./assets/cavars.js"
 //导入轮播图插件
 import ElementUI from 'element-ui';
@@ -83,6 +84,9 @@ Vue.use(iView);
 import ProductZoomer from 'vue-product-zoomer'
 Vue.use(ProductZoomer)
 
+//导入二维码插件
+import VueQriously from 'vue-qriously'
+Vue.use(VueQriously)
 
 Vue.use(VueLazyload, {
   preLoad: 1.3,
@@ -127,10 +131,11 @@ const routes=[
 
   },
   {
-    path:'/checkOrder',
+    path:'/checkOrder/:ids',
     component:checkOrder,
     meta:{
-      titleName:"订单详情页"
+      titleName:"订单详情页",
+      checkLogin:true,
     }
 
   },
@@ -141,6 +146,14 @@ const routes=[
       titleName:"登录页"
     }
 
+  },
+  {
+    path:"/payOrder/:orderid",
+    component:payOrder,
+    meta:{
+      titleName:"支付页",
+      checkLogin:true,
+    }
   }
 ]
 //实例化路由对象
@@ -153,10 +166,10 @@ router.beforeEach((to,from,next)=>{
 //  console.log(to);
 //  console.log(from);
 window.document.title=to.meta.titleName;
-if(to.path=="/checkOrder"){
+if(to.meta.checkLogin==true){
   axios.get("site/account/islogin").then(
    response=>{
-    console.log(response);
+    // console.log(response);
     if(response.data.code=="nologin"){
       Vue.prototype.$message.warning("请先登录哈");
       router.push("/login");

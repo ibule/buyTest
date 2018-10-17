@@ -44,8 +44,8 @@
                             <span>1、收货地址</span>
                         </h2>
                        <el-form status-icon label-position="left" :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-                            <el-form-item  label="姓名" prop="name" >
-                             <el-input style="width:500px"  v-model.trim="ruleForm.name"></el-input>
+                            <el-form-item  label="姓名" prop="accept_name" >
+                             <el-input style="width:500px"  v-model.trim="ruleForm.accept_name"></el-input>
                                 </el-form-item>       
                             <el-form-item  label="所属区域" prop="address" >
                             <v-distpicker @selected="areaChange" :province="ruleForm.area.province.value" :city="ruleForm.area.city.value" :area="ruleForm.area.area.value"></v-distpicker>
@@ -180,11 +180,11 @@
                                 <!--取得一个DataTable-->
                                 <li>
                                  
-                                    <el-radio v-model="ruleForm.express_id" label="1">顺丰快递</el-radio>
+                                    <el-radio @change="changeExpress(20) "  v-model="ruleForm.express_id" label="1">顺丰快递</el-radio>
                                        <em>费用：20.00元</em>
-                                    <el-radio v-model="ruleForm.express_id" label="2">圆通快递</el-radio>
+                                    <el-radio @change="changeExpress(12) " v-model="ruleForm.express_id" label="2">圆通快递</el-radio>
                                        <em>费用：12.00元</em>
-                                    <el-radio v-model="ruleForm.express_id" label="3">韵达快递</el-radio>
+                                    <el-radio @change="changeExpress(10) " v-model="ruleForm.express_id" label="3">韵达快递</el-radio>
                                        <em>费用：10.00元</em>
                                 </li>
                             </ul>
@@ -200,24 +200,27 @@
                                         <th width="84" align="center">购买数量</th>
                                         <th width="104" align="left">金额(元)</th>
                                     </tr>
-                                    <tr>
+                                    <tr v-for="(item, index) in goodlist" :key="item.id">
                                         <td width="68">
-                                            <a target="_blank" href="/goods/show-89.html">
-                                                <img src="http://39.108.135.214:8899/upload/201504/20/thumb_201504200046589514.jpg" class="img">
-                                            </a>
+                                            <router-link :to="'/detail/'+item.id">
+                                                <img :src="item.img_url" class="img">
+                                            </router-link>
                                         </td>
                                         <td>
-                                            <a target="_blank" href="/goods/show-89.html">小米（Mi）小米Note 16G双网通版</a>
+                                             <router-link :to="'/detail/'+item.id">
+                                              {{item.title}}
+                                            </router-link>
+                                          
                                         </td>
                                         <td>
                                             <span class="red">
-                                                ￥2299.00
+                                                ￥{{item.sell_price}}
                                             </span>
                                         </td>
-                                        <td align="center">1</td>
+                                        <td align="center">{{item.buycount}}</td>
                                         <td>
                                             <span class="red">
-                                                ￥2299.00
+                                                ￥{{item.buycount*item.sell_price}}
                                             </span>
                                         </td>
                                     </tr>
@@ -232,31 +235,32 @@
                                     <dl>
                                         <dt>订单备注(100字符以内)</dt>
                                         <dd>
-                                            <textarea name="message" class="input" style="height:35px;"></textarea>
+                                          
+                                             <textarea v-model="ruleForm.message" name="message" class="input" style="height:35px;"></textarea>
                                         </dd>
                                     </dl>
                                 </div>
                                 <div class="right-box">
                                     <p>
                                         商品
-                                        <label class="price">1</label> 件&nbsp;&nbsp;&nbsp;&nbsp; 商品金额：￥
-                                        <label id="goodsAmount" class="price">2299.00</label> 元&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <label class="price">{{$store.getters.carGoodCount}}</label> 件&nbsp;&nbsp;&nbsp;&nbsp; 商品金额：￥
+                                        <label id="goodsAmount" class="price">{{ruleForm.goodsAmount}}</label> 元&nbsp;&nbsp;&nbsp;&nbsp;
                                     </p>
                                     <p>
                                         运费：￥
-                                        <label id="expressFee" class="price">0.00</label> 元
+                                        <label id="expressFee" class="price">{{ruleForm.expressMoment}}</label> 元
                                     </p>
                                     <p class="txt-box">
                                         应付总金额：￥
-                                        <label id="totalAmount" class="price">2299.00</label>
+                                        <label id="totalAmount" class="price">{{ruleForm.goodsAmount+ruleForm.expressMoment}}</label>
                                     </p>
                                     <p class="btn-box">
                                         <a class="btn button" href="/cart.html">返回购物车</a>
-                                        <a id="btnSubmit" class="btn submit">确认提交</a>
+                                        <a id="btnSubmit" @click="submitOrder" class="btn submit">确认提交</a>
                                     </p>
                                 </div>
                             </div>
-                        </div> -->
+                        </div> 
                     </div>
                 </div>
             </div>
@@ -309,7 +313,7 @@ export default {
     };
     return {
       ruleForm: {
-        name: "",
+        accept_name: "",
         address: "",
         mobile: "",
         email: "",
@@ -330,11 +334,17 @@ export default {
            
         },
         express_id:"1",
-        payment_id:"6"
-        
+        payment_id:"6",
+        cargoodsobj:{},
+        goodsAmount:0,
+        expressMoment:20,
+        message:"",
+        accept_name:"",
+        goodsids:""
       },
+      goodlist:[],
       rules: {
-        name: [
+        accept_name: [
           { required: true, message: "请输入姓名", trigger: "blur" },
           {
             min: 2,
@@ -360,7 +370,56 @@ export default {
   methods: {
     areaChange(data) {
       this.ruleForm.area=data;  
+    },
+    changeExpress(data){
+        this.ruleForm.expressMoment=data;
+    },
+    submitOrder(){
+        console.log(this.ruleForm);
+        
+        this.$axios.post("site/validate/order/setorder",
+            this.ruleForm
+        ).then(response=>{
+            console.log(response);
+            //删除购物车的数据
+
+            if(response.data.status==0){
+                 this.$message.success("订单提交成功")
+                for(let key in this.ruleForm.cargoodsobj){
+                this.$store.commit("delGood",key)
+            }
+            this.$router.push("/payOrder/"+response.data.message.orderid)
+            }else{
+                this.$message.error("服务器处理失败")
+            }
+            
+
+            
+        })
     }
+  },
+  created(){
+    //   console.log(this.$route.params.ids);
+      this.ruleForm.goodsids=this.$route.params.ids;
+      this.$axios.get('site/validate/order/getgoodslist/'+this.$route.params.ids).then(
+           response=>{
+               console.log(response);
+               let tempdta={};
+            //    let totalPrice=0;
+               response.data.message.forEach(element => {
+                   element.buycount=this.$store.state.shopCarData[element.id];
+                   tempdta[element.id]=element.buycount;
+                  this.ruleForm.goodsAmount+=element.sell_price*element.buycount;
+                  
+               });
+               this.ruleForm.cargoodsobj=tempdta;
+               this.goodlist=response.data.message;
+               console.log(this.ruleForm.cargoodsobj);
+               console.log(this.ruleForm.goodlist);
+               
+               
+           }
+      );
   }
 };
 </script>
