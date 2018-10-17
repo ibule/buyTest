@@ -173,6 +173,10 @@ if(to.path=="/checkOrder"){
  
   
   })
+
+  router.afterEach((to,from)=>{
+    window.scroll(0,0)
+  })
 //全局过滤器
 import moment from "moment";
 Vue.filter('capitalize', function (value) {

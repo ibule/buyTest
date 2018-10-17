@@ -43,7 +43,26 @@
                         <h2 class="slide-tit">
                             <span>1、收货地址</span>
                         </h2>
-                        <div id="orderForm" name="orderForm" url="">
+                       <el-form status-icon label-position="left" :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                            <el-form-item  label="姓名" prop="name" >
+                             <el-input   v-model.trim="ruleForm.name"></el-input>
+                                </el-form-item>       
+                            <el-form-item  label="地址" prop="address" >
+                             <el-input   v-model.trim="ruleForm.address"></el-input>
+                                </el-form-item>    
+                                 <el-form-item label="手机号码" prop="mobile">
+                                 <el-input  v-model="ruleForm.mobile" ></el-input>
+                                 </el-form-item>   
+                                </el-form-item>    
+                                 <el-form-item label="邮箱" prop="email">
+                                 <el-input   v-model="ruleForm.email" ></el-input>
+                                 </el-form-item>   
+                                </el-form-item>    
+                                 <el-form-item label="邮编" prop="post_code">
+                                 <el-input style="width:100px" v-model="ruleForm.post_code" ></el-input>
+                                 </el-form-item>   
+                        </el-form>
+                        <!-- <div id="orderForm" name="orderForm" url="">
                             <div class="form-box address-info">
                                 <dl class="form-group">
                                     <dt>收货人姓名：</dt>
@@ -234,7 +253,7 @@
                                     </p>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -245,10 +264,80 @@
 </template>
 
 <script>
-    export default{
-        name:"checkorder"
-    }
+export default {
+  name: "checkorder",
+  data: function() {
+        var validateMobile = (rule, value, callback) => {
+            let reg=/^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
+        if (!value) {
+          return callback(new Error('手机号码不能为空'));
+        }
+        setTimeout(() => {
+        if(reg.test(value)==false){
+            return callback(new Error('手机号码输入错误'));
+        }else{
+            callback();
+        }
+        }, 500);
+      };
+        var validateEmail = (rule, value, callback) => {
+            let reg=/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+       
+        setTimeout(() => {
+        if(reg.test(value)==false){
+            return callback(new Error('邮箱输入错误'));
+        }else{
+            callback();
+        }
+        }, 500);
+      };
+        var validatePostcode = (rule, value, callback) => {
+            let reg=/^[1-9]\d{5}(?!\d)$/ ;
+       
+        setTimeout(() => {
+        if(reg.test(value)==false){
+            return callback(new Error('邮编输入错误'));
+        }else{
+            callback();
+        }
+        }, 500);
+      };
+    return {
+      ruleForm: {
+        name: "",
+        address: "",
+        mobile:"",
+        email:"",
+        post_code:""
+      },
+      rules: {
+        name: [
+          { required: true, message: "请输入姓名", trigger: "blur" },
+          {
+            min: 2,
+            max: 10,
+            message: "长度在 3 到 5 个字符",
+            trigger: "change"
+          }
+        ],
+        address: [
+          { required: true, message: "请输入地址", trigger: "blur" },
+          { min: 3, message: "地址大于3个字符", trigger: "change" }
+        ],
+        mobile: [
+            { required: true, message: "请输入手机号", trigger: "blur" },
+            { validator: validateMobile, trigger:"change" }
+          ],
+        email: [
+            { validator: validateEmail, trigger:"change" }
+          ],
+        post_code: [
+            { validator: validatePostcode, trigger:"change" }
+          ],
+      }
+    };
+  }
+};
 </script>
 <style>
-
 </style>
