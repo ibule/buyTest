@@ -149,7 +149,7 @@ export default {
         // let shopcarlist = response.data.message;
         this.goodList=response.data.message;
        //修改商品数量为正确的数值 添加一个选择对象到goodlist里 
-        response.data.message.forEach(element => {
+        response.data.message.forEach(element => { 
           element.buycount = this.$store.state.shopCarData[element.id];
         //   element.selected = true;
           this.$set(element,"selected",true)

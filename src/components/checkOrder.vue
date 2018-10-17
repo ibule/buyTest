@@ -45,19 +45,22 @@
                         </h2>
                        <el-form status-icon label-position="left" :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
                             <el-form-item  label="姓名" prop="name" >
-                             <el-input   v-model.trim="ruleForm.name"></el-input>
+                             <el-input style="width:500px"  v-model.trim="ruleForm.name"></el-input>
                                 </el-form-item>       
+                            <el-form-item  label="所属区域" prop="address" >
+                            <v-distpicker @selected="areaChange" :province="ruleForm.area.province.value" :city="ruleForm.area.city.value" :area="ruleForm.area.area.value"></v-distpicker>
+                                </el-form-item>    
                             <el-form-item  label="地址" prop="address" >
-                             <el-input   v-model.trim="ruleForm.address"></el-input>
+                             <el-input style="width:500px"  v-model.trim="ruleForm.address"></el-input>
                                 </el-form-item>    
                                  <el-form-item label="手机号码" prop="mobile">
-                                 <el-input  v-model="ruleForm.mobile" ></el-input>
+                                 <el-input style="width:500px" v-model="ruleForm.mobile" ></el-input>
                                  </el-form-item>   
-                                </el-form-item>    
+                                 
                                  <el-form-item label="邮箱" prop="email">
-                                 <el-input   v-model="ruleForm.email" ></el-input>
+                                 <el-input  style="width:500px" v-model="ruleForm.email" ></el-input>
                                  </el-form-item>   
-                                </el-form-item>    
+                                   
                                  <el-form-item label="邮编" prop="post_code">
                                  <el-input style="width:100px" v-model="ruleForm.post_code" ></el-input>
                                  </el-form-item>   
@@ -163,12 +166,11 @@
                             </h2>
                             <ul class="item-box clearfix">
                                 <!--取得一个DataTable-->
+                                 <ul class="item-box clearfix">
                                 <li>
-                                    <label>
-                                        <input name="payment_id" type="radio" onclick="paymentAmountTotal(this);" value="1">
-                                        <input name="payment_price" type="hidden" value="0.00">在线支付
-                                        <em>手续费：0.00元</em>
-                                    </label>
+                                      <el-radio v-model="ruleForm.payment_id" label="6">在线支付</el-radio>
+                                       <em>手续费：0.00元</em>
+                                   
                                 </li>
                             </ul>
                             <h2 class="slide-tit">
@@ -177,12 +179,13 @@
                             <ul class="item-box clearfix">
                                 <!--取得一个DataTable-->
                                 <li>
-                                    <label>
-                                        <input name="express_id" type="radio" onclick="freightAmountTotal(this);" value="1" datatype="*" sucmsg=" ">
-                                        <input name="express_price" type="hidden" value="20.00">顺丰快递
-                                        <em>费用：20.00元</em>
-                                        <span class="Validform_checktip"></span>
-                                    </label>
+                                 
+                                    <el-radio v-model="ruleForm.express_id" label="1">顺丰快递</el-radio>
+                                       <em>费用：20.00元</em>
+                                    <el-radio v-model="ruleForm.express_id" label="2">圆通快递</el-radio>
+                                       <em>费用：12.00元</em>
+                                    <el-radio v-model="ruleForm.express_id" label="3">韵达快递</el-radio>
+                                       <em>费用：10.00元</em>
                                 </li>
                             </ul>
                             <h2 class="slide-tit">
@@ -264,51 +267,71 @@
 </template>
 
 <script>
+//引入省市联动插件
+import VDistpicker from 'v-distpicker'
 export default {
   name: "checkorder",
   data: function() {
-        var validateMobile = (rule, value, callback) => {
-            let reg=/^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
-        if (!value) {
-          return callback(new Error('手机号码不能为空'));
+    var validateMobile = (rule, value, callback) => {
+      let reg = /^(0|86|17951)?(13[0-9]|15[012356789]|166|17[3678]|18[0-9]|14[57])[0-9]{8}$/;
+      if (!value) {
+        return callback(new Error("手机号码不能为空"));
+      }
+      setTimeout(() => {
+        if (reg.test(value) == false) {
+          return callback(new Error("手机号码输入错误"));
+        } else {
+          callback();
         }
-        setTimeout(() => {
-        if(reg.test(value)==false){
-            return callback(new Error('手机号码输入错误'));
-        }else{
-            callback();
+      }, 500);
+    };
+    var validateEmail = (rule, value, callback) => {
+      let reg = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+
+      setTimeout(() => {
+        if (reg.test(value) == false) {
+          return callback(new Error("邮箱输入错误"));
+        } else {
+          callback();
         }
-        }, 500);
-      };
-        var validateEmail = (rule, value, callback) => {
-            let reg=/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-       
-        setTimeout(() => {
-        if(reg.test(value)==false){
-            return callback(new Error('邮箱输入错误'));
-        }else{
-            callback();
+      }, 500);
+    };
+    var validatePostcode = (rule, value, callback) => {
+      let reg = /^[1-9]\d{5}(?!\d)$/;
+
+      setTimeout(() => {
+        if (reg.test(value) == false) {
+          return callback(new Error("邮编输入错误"));
+        } else {
+          callback();
         }
-        }, 500);
-      };
-        var validatePostcode = (rule, value, callback) => {
-            let reg=/^[1-9]\d{5}(?!\d)$/ ;
-       
-        setTimeout(() => {
-        if(reg.test(value)==false){
-            return callback(new Error('邮编输入错误'));
-        }else{
-            callback();
-        }
-        }, 500);
-      };
+      }, 500);
+    };
     return {
       ruleForm: {
         name: "",
         address: "",
-        mobile:"",
-        email:"",
-        post_code:""
+        mobile: "",
+        email: "",
+        post_code: "",
+        area:{
+           province:{
+               code:"440000",
+               value:"广东省"
+           },
+           city:{
+               code:"440300",
+               value:"深圳市"
+           },
+           area:{
+               code:"440306",
+               value:"宝安区"
+           }
+           
+        },
+        express_id:"1",
+        payment_id:"6"
+        
       },
       rules: {
         name: [
@@ -325,17 +348,19 @@ export default {
           { min: 3, message: "地址大于3个字符", trigger: "change" }
         ],
         mobile: [
-            { required: true, message: "请输入手机号", trigger: "blur" },
-            { validator: validateMobile, trigger:"change" }
-          ],
-        email: [
-            { validator: validateEmail, trigger:"change" }
-          ],
-        post_code: [
-            { validator: validatePostcode, trigger:"change" }
-          ],
+          { required: true, message: "请输入手机号", trigger: "blur" },
+          { validator: validateMobile, trigger: "change" }
+        ],
+        email: [{ validator: validateEmail, trigger: "change" }],
+        post_code: [{ validator: validatePostcode, trigger: "change" }]
       }
     };
+  },
+  components: { VDistpicker },
+  methods: {
+    areaChange(data) {
+      this.ruleForm.area=data;  
+    }
   }
 };
 </script>
