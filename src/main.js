@@ -60,6 +60,7 @@ import shopcar from "./components/shopcar.vue"
 import checkOrder from "./components/checkOrder.vue"
 import login from "./components/login.vue"
 import payOrder from "./components/payOrder.vue"
+import paySuccess from "./components/paySuccess.vue"
 import "./assets/cavars.js"
 //导入轮播图插件
 import ElementUI from 'element-ui';
@@ -152,6 +153,14 @@ const routes=[
     component:payOrder,
     meta:{
       titleName:"支付页",
+      checkLogin:true,
+    }
+  },
+  {
+    path:"/paySuccess",
+    component:paySuccess,
+    meta:{
+      titleName:"支付页成功",
       checkLogin:true,
     }
   }

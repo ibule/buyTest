@@ -73,7 +73,7 @@
                             <div class="el-col el-col-6">
                                 <div id="container2">
                                    <!-- <img src="../assets/statics/images/error.png" alt=""> -->
-                                   <qriously value="Hello World!" :size="200" />
+                                   <qriously :value="'site/validate/pay/alipay/'+orderMessage.id" :size="200" />
                                 </div>
                             </div>
                         </div>
@@ -98,7 +98,7 @@
         created(){
             this.$axios.get("site/validate/order/getorder/"+this.$route.params.orderid).then(
                 response=>{
-                    console.log(response);
+                    // console.log(response);
                     if(response.data.status==0){
                         this.orderMessage=response.data.message[0];
                     }
@@ -106,7 +106,11 @@
                     
                     
                 }
-            )
+            );
+            this.$axios.get(`site/validate/pay/alipay/${this.orderMessage.id}`).then(response=>{
+                console.log(response);
+                
+            })
         }
     }
 </script>
