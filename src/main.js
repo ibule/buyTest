@@ -61,7 +61,11 @@ import checkOrder from "./components/checkOrder.vue"
 import login from "./components/login.vue"
 import payOrder from "./components/payOrder.vue"
 import paySuccess from "./components/paySuccess.vue"
+import userinfo from "./components/userinfo.vue"
 import "./assets/cavars.js"
+import info from "./components/userinfoChildren/info.vue"
+import  orderinfo from "./components/userinfoChildren/orderinfo.vue"
+import orderlist from "./components/userinfoChildren/orderlist.vue"
 //导入轮播图插件
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
@@ -163,6 +167,40 @@ const routes=[
       titleName:"支付页成功",
       checkLogin:true,
     }
+  },
+  {
+    path:"/userinfo",
+    component:userinfo,
+    meta:{
+      titleName:"会员中心",
+      checkLogin:true,
+    },
+    children:[
+      {
+        path:"",
+        component:info,
+        meta:{
+          titleName:"个人信息",
+          checkLogin:true,
+        }
+      },
+      {
+        path:"orderinfo/:orderid",
+        component:orderinfo,
+        meta:{
+          titleName:"订单信息",
+          checkLogin:true,
+        }
+      },
+      {
+        path:"orderlist",
+        component:orderlist,
+        meta:{
+          titleName:"订单列表",
+          checkLogin:true,
+        }
+      },
+    ]
   }
 ]
 //实例化路由对象

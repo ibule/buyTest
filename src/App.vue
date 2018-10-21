@@ -21,7 +21,7 @@
                     </span>
                     <!-- 登录后显示 -->
                     <span v-show="$store.state.checkLoginState==true">
-                        <a href="" class="">会员中心</a>
+                       <router-link to="/userinfo">会员中心</router-link>
                         <strong>|</strong>
                         <a @click="logout">退出</a>
                         <strong>|</strong>
@@ -135,12 +135,12 @@ export default {
   },
   methods:{
 checknum(){
-    console.log(this.$store.state.count);
+    // console.log(this.$store.state.count);
     this.$store.commit('increment');
 },
  logout(){
       this.$axios.get("site/account/logout").then(response=>{
-          console.log(response);
+        //   console.log(response);
                this.$confirm('你确定要离开我吗?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -164,10 +164,10 @@ checknum(){
 created() {
     // console.log('顶级Vue示例的生命周期函数');
   this.$axios.get('site/account/islogin').then(response => {
-      console.log(response);
+    //   console.log(response);
       if (response.data.code == 'logined') {
         // 登录了
-        console.log("我登陆了");
+        // console.log("我登陆了");
         
        this.$store.commit('updateLogin', true);
       } else {

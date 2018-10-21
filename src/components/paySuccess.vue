@@ -23,9 +23,10 @@
                                                 <i class="iconfont icon-check"></i>
                                             </div>
                                             <div class="info">
-                                                <strong>订单已支付成功！</strong>
+                                                <strong>订单已支付成功！</strong>  <span>还有{{num}}秒返回首页</span>
                                                 <p>您可以点击这里进入
-                                                    <a href="/user/center/index.html">会员中心</a>查看订单状态！</p>
+                                                  <router-link to="/userinfo">会员中心</router-link>
+                                                    查看订单状态！</p>
                                                 <p>如有其它问题，请立即与我们客服人员联系。</p>
                                             </div>
                                         </div>
@@ -43,7 +44,26 @@
 </template>
 <script>
     export default{
-        name:"paysuccess"
+        name:"paysuccess",
+        data(){
+            return{
+                num:5,
+                intervalId:0
+            }
+        },
+        created(){
+            this.intervalId=setInterval(()=>{
+                this.num--;
+                console.log(this.num);
+                
+                if(this.num==0){
+                    this.$router.push('/index');
+                }
+            },1000)
+        },
+        destroyed(){
+            clearInterval(this.intervalId);
+        }
     }
 </script>
 <style>

@@ -91,30 +91,49 @@
         name:"payOrder",
         data:function(){
                  return{
-                orderMessage:{}
+                orderMessage:{},
+                intervalId:0,
+             orderId:0,
             }
         },
-       
-        created(){
-            this.$axios.get("site/validate/order/getorder/"+this.$route.params.orderid).then(
-                response=>{
-                    // console.log(response);
-                    if(response.data.status==0){
+       methods:{
+           getOrderInfo(){
+               
+            this.$axios.get("site/validate/order/getorder/"+this.orderId).then(
+                response=>{         
                         this.orderMessage=response.data.message[0];
-                    }
-                    console.log(this.orderMessage);
-                    
-                    
+                       
                 }
             );
-            this.$axios.get(`site/validate/pay/alipay/${this.orderMessage.id}`).then(response=>{
-                console.log(response);
+           }
+       },
+        created(){
+            this.orderId=this.$route.params.orderid;
+            console.log(this.orderId);  
+             this.getOrderInfo();
+      //设置定时器 查询支付状态
+    
+      
+     this.intervalId= setInterval(()=>{
+           this.$axios.get("site/validate/order/getorder/"+this.orderId).then(
+                response=>{         
+                      console.log(response.data.message[0].status);
+                        if(response.data.message[0].status==2){
+                                //支付成功
+                                this.$router.push('/paySuccess');
+                        }
+
+                }
+            );
+      },1000)
                 
-            })
+            },
+  destroyed(){
+                clearInterval(this.intervalId)
+            }
         }
-    }
+    
 </script>
 <style>
-
 </style>
 
